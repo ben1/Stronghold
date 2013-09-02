@@ -9,9 +9,19 @@ define e = Character('Eileen', color="#c8ffc8")
 
 # The game starts here.
 label start:
+    "How shall the brave adventurer be known as?"
 
-    e "You've created a new Ren'Py game."
+menu:    
+    
+    "Sir":
+        jump sir
+    "Lady":
+        jump lady
 
-    e "Once you add a story, pictures, and music, you can release it to the world!"
+label sir:
+    "Hi Sir."
+    return
 
+label lady:
+    "Hi Lady."
     return
