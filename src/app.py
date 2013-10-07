@@ -22,14 +22,17 @@ class QuitDialog(gui.Dialog):
         t.td(e)
         
         gui.Dialog.__init__(self,title,t)
+
+
         
 class App(gui.Desktop):
     def __init__(self,**params):
         gui.Desktop.__init__(self,**params)
         
+        self.gameState = None
         self.connect(gui.QUIT,self.quit,None)
         
-        c = gui.Container(width=960,height=960)
+        c = gui.Container(width=800,height=800)
                 
         self.new_d = QuitDialog()
         self.new_d.connect(gui.CHANGE,self.action_new,None)
@@ -47,7 +50,10 @@ class App(gui.Desktop):
         self.widget = c
         
     def action_new(self,value):
-        self.gameState = GameState()
+        if(self.gameState):
+            self.gameState.cleanup()
+        self.gameState = GameState(self.widget)
+        
                 
     def process_event(self,event):
         if event.type == pygame.KEYDOWN:
@@ -80,6 +86,9 @@ class App(gui.Desktop):
                     if not self.console.process_input(event):
                         if not (event.type == pygame.QUIT and self.mywindow):
                             self.event(event)
+            #update
+            if(self.gameState):
+                self.gameState.update()
             # draw
             pygame.display.update(self.update())
             self.console.draw()
