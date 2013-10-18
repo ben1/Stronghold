@@ -1,4 +1,5 @@
 
+from PySide import QtCore
 import actors
 import scenes
 import events
@@ -6,9 +7,14 @@ import views
 
 ''' 
 '''
-class GameState():
-    def __init__(self, widget):
-        self.widget = widget
+class GameState(QtCore.QObject):
+    sigEnterScene = QtCore.Signal(scenes.Scene)
+    sigLeaveScene = QtCore.Signal(scenes.Scene)
+    
+    def __init__(self):
+        super().__init__()
+        
+    def init(self):
         self.pendingScenes = []
         self.player = actors.Player()
         self.emperor = actors.Emperor()
@@ -47,24 +53,26 @@ class GameState():
         
     def enterScene(self, scene):
         self.scene = scene
-        scene.view = views.SceneView(scene)
-        self.widget.add(scene.view, 0, 50)
+        #scene.view = views.SceneView(scene)
+        #self.widget.add(scene.view, 0, 50)
+        self.sigEnterScene.emit(scene)
         scene.enter()
 
     def leaveScene(self):
         if self.scene:
-            self.widget.remove(self.scene.view)
+            self.sigLeaveScene.emit(self.scene)
+            #self.widget.remove(self.scene.view)
             self.scene.leave()
             self.scene = None
-        
-    def update(self):
+    
+    def next(self):
         if(self.scene):
-            # update the scene
-            if not (self.scene.update()):
-                # go to the next scene
+            if self.scene.next():
                 self.leaveScene()
                 self.prepareNextScene()
-        
+        else:
+            self.prepareNextScene()
+    
     def prepareNextScene(self):
         if len(self.pendingScenes) > 0:
             self.enterScene(self.pendingScenes.pop(0))

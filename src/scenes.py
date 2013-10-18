@@ -3,10 +3,15 @@ Created on 05/10/2013
 
 @author: Ben
 '''
+from PySide import QtCore
 import events
 
-class Scene():
+
+class Scene(QtCore.QObject):
+    sigEvent = QtCore.Signal(events.Event)
+    
     def __init__(self, gameState):
+        super().__init__()
         self.gameState = gameState
         self.name = 'Somewhere'
         self.actors = {}
@@ -20,26 +25,26 @@ class Scene():
         self.events.append(event)
         
     def enter(self):
-        self.view.onEnterScene(self)
         if(len(self.events) > 0):
             self.currentEvent = self.events[0]
-            self.currentEvent.render(self.view)
+            self.currentEvent.trigger()
+            self.sigEvent.emit(self.currentEvent)
 
     def leave(self):
         pass
         
-    def update(self):
-        if(self.currentEvent):
-            if(self.currentEvent.update()):
-                return True
+    def next(self):
+        if self.currentEvent:
+            if not self.currentEvent.next():
+                return False
             else:
                 self.events = self.events[1:]
                 if(len(self.events) > 0):
                     self.currentEvent = self.events[0]
-                    self.currentEvent.render(self.view)
-                    return True
-        # the scene is finished
-        return False
+                    self.currentEvent.trigger()
+                    self.sigEvent.emit(self.currentEvent)
+                    return False
+        return True # the scene is finished
 
               
 class GameOver(Scene):
