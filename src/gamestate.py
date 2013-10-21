@@ -3,7 +3,6 @@ from PySide import QtCore
 import actors
 import scenes
 import events
-import views
 
 ''' 
 '''
@@ -20,7 +19,7 @@ class GameState(QtCore.QObject):
         self.emperor = actors.Emperor()
         self.advisor = actors.Advisor()
         
-        ns = scenes.Scene(self)
+        ns = scenes.Scene()
         ns.name = 'Imperial Court'
         ns.addActor(self.player)
         ns.addActor(self.emperor)
@@ -36,9 +35,9 @@ class GameState(QtCore.QObject):
         ns.addEvent(events.Say(self.emperor, "It is on the Eastern border of the Empire, not entirely civilised, but I believe it will suit your adventurous spirit! I shall send an advisor with you to help you learn the ways of a Dominus."))
         ns.addEvent(events.Say(self.emperor, "You will leave on tomorrow's Eastern railvan."))
         ns.addEvent(events.Narration("Nobility! All of your descendants will bear this status. If you have any, that is. The thought of governing a domain makes you a little nervous, but how hard can the life of a noble be? You've definitely survived worse."))
-        self.enterScene(ns)
+        self.pendingScenes.append(ns)
 
-        s2 = scenes.Scene(self)
+        s2 = scenes.Scene()
         s2.name = "Arinna Central Railvan Station"
         s2.addActor(self.player)
         s2.addActor(self.advisor)
@@ -47,16 +46,17 @@ class GameState(QtCore.QObject):
         s2.addEvent(events.Narration("Johan steps up into the first class railvan carriage being pushed in front of the engine, and you follow him. The troops pack into a van pulled behind, and the caravan jolts forward slowly gaining speed."))
 
         self.pendingScenes.append(s2)
+        
+        self.prepareNextScene()
+        
 
     def cleanup(self):
         self.leaveScene()
         
     def enterScene(self, scene):
         self.scene = scene
-        #scene.view = views.SceneView(scene)
-        #self.widget.add(scene.view, 0, 50)
         self.sigEnterScene.emit(scene)
-        scene.enter()
+        scene.enter(self) #has to be after sigEnterScene otherwise events aren't hooked up before scene.enter() triggers them.
 
     def leaveScene(self):
         if self.scene:
@@ -67,16 +67,18 @@ class GameState(QtCore.QObject):
     
     def next(self):
         if(self.scene):
-            if self.scene.next():
-                self.leaveScene()
-                self.prepareNextScene()
+            self.scene.next()
         else:
             self.prepareNextScene()
     
+    def doNextScene(self):
+        self.leaveScene()
+        self.prepareNextScene()
+        
     def prepareNextScene(self):
         if len(self.pendingScenes) > 0:
             self.enterScene(self.pendingScenes.pop(0))
         else:
-            self.enterScene(scenes.GameOver(self))
+            self.enterScene(scenes.GameOver())
 
 

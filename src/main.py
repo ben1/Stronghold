@@ -1,11 +1,10 @@
 """
 """
-#from app import App
 import sys
 from PySide import QtGui, QtCore
 from gamestate import GameState
-#app = App()
-#app.run()
+from views import GameView, SceneView, Paragraph
+
 
 class MainMenu(QtGui.QWidget):
     signalNew = QtCore.Signal()
@@ -33,58 +32,6 @@ class MainMenu(QtGui.QWidget):
         vbox.addStretch()
 
 
-class Paragraph(QtGui.QLabel):
-
-    def __init__(self, text):
-        super().__init__()
-        self.setText(text)  
-        self.setWordWrap(True)
-
-
-class GameView(QtGui.QWidget):
-    
-    def __init__(self, gameState):
-        super().__init__()
-        self.gameState = gameState
-        
-        hbox = QtGui.QHBoxLayout()
-        self.setLayout(hbox)
-        hbox.addStretch()
-        self.vbox = QtGui.QVBoxLayout()
-        self.vbox.addStretch()
-        hbox.addLayout(self.vbox)
-        hbox.addStretch()
-        
-        self.gameState.sigEnterScene.connect(self.onEnterScene)
-
-    def mousePressEvent(self, e):
-        self.gameState.next()
-
-    def onEnterScene(self, scene):
-        scene.sigEvent.connect(self.onSceneEvent)
-        t = Paragraph(scene.name)
-        self.vbox.insertWidget(self.vbox.count() - 1, t)
-
-    def onSceneEvent(self, event):
-        if event.__class__.__name__ == 'Say':
-            text = event.text
-            if(event.sourceActor.isPlayer):
-                text = 'You say "' + text + '"'
-            else:
-                text = event.sourceActor.name + ' says "' + text + '"'
-            self.vbox.insertWidget(self.vbox.count() - 1, Paragraph(text))
-        elif event.__class__.__name__ == 'Narration':
-            self.vbox.insertWidget(self.vbox.count() - 1, Paragraph(event.text))
-        elif event.__class__.__name__ == 'GetUserText':
-            self.vbox.insertWidget(self.vbox.count() - 1, Paragraph(event.caption))
-            e = QtGui.QLineEdit()
-            self.getUserText = e
-            e.returnPressed.connect(self.onGetUserText)
-            self.vbox.insertWidget(self.vbox.count() - 1, e)
-
-    def onGetUserText(self):
-        # do something with self.getUserText.text()
-        
 
 class AppWindow(QtGui.QMainWindow):
     def __init__(self):

@@ -3,76 +3,88 @@ Created on 06/10/2013
 
 @author: Ben
 '''
-import pygame
-from pgu import gui
-import events
+from PySide import QtGui, QtCore
+from gamestate import GameState
 
 
-class SceneView(gui.ScrollArea):
+class Paragraph(QtGui.QLabel):
+
+    def __init__(self, text):
+        super().__init__()
+        self.setText(text)  
+        self.setWordWrap(True)
+        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Preferred);
+
+
+class SceneView(QtGui.QScrollArea):
+
     def __init__(self, scene):
+        super().__init__()
         self.scene = scene
-        doc = gui.Document(width=700, height = 400)
-        super().__init__(doc, hscrollbar = False)
-        self.space = doc.style.font.size(" ")
-        self.widget.block(align=-1)
-        self.textInput = None
+        scene.sigEvent.connect(self.onSceneEvent)
 
-    def addText(self, text):
-        for word in text.split(' '):
-            self.widget.add(gui.Label(word))
-            self.widget.space(self.space)
+        # why doesn't this work?
+        #s = QtGui.QWidget()
+        #self.setWidget(s)
+        #s.setLayout(hbox)
+        hbox = QtGui.QHBoxLayout()
+        self.setLayout(hbox)
+        hbox.addStretch(1)
+        self.vbox = QtGui.QVBoxLayout()
+        self.vbox.addStretch()
+        hbox.addLayout(self.vbox, 3)
+        hbox.addStretch(1)
+
+        t = Paragraph(scene.name)
+        self.vbox.insertWidget(self.vbox.count() - 1, t)
+        
+    def onSceneEvent(self, event):
+        self.currentEvent = event
+        if event.__class__.__name__ == 'Say':
+            text = event.text
+            if(event.sourceActor.isPlayer):
+                text = 'You say "' + text + '"'
+            else:
+                text = event.sourceActor.name + ' says "' + text + '"'
+            self.vbox.insertWidget(self.vbox.count() - 1, Paragraph(text))
+        elif event.__class__.__name__ == 'Narration':
+            p = Paragraph(event.text)
+            self.vbox.insertWidget(self.vbox.count() - 1, p)
+            print(p.sizeHint())
+        elif event.__class__.__name__ == 'GetUserText':
+            self.vbox.insertWidget(self.vbox.count() - 1, Paragraph(event.caption))
+            e = QtGui.QLineEdit()
+            self.getUserText = e
+            e.returnPressed.connect(self.onGetUserText)
+            self.vbox.insertWidget(self.vbox.count() - 1, e)
+
+    def onGetUserText(self):
+        #remove caption and QLineEdit
+        oldText = self.vbox.takeAt(self.vbox.count() - 2)
+        oldText.widget().deleteLater()
+        oldText = self.vbox.takeAt(self.vbox.count() - 2)
+        oldText.widget().deleteLater()
+        self.currentEvent.setText(self.getUserText.text())
+
+
+class GameView(QtGui.QWidget):
+    
+    def __init__(self, gameState):
+        super().__init__()
+        self.gameState = gameState        
+        self.gameState.sigEnterScene.connect(self.onEnterScene)
+        self.hbox = QtGui.QVBoxLayout()
+        self.setLayout(self.hbox)
+
+    def mousePressEvent(self, e):
+        self.gameState.next()
 
     def onEnterScene(self, scene):
-        self.addText(scene.name)
-        self.widget.br(self.space[1])
+        # Qt requires removing the layout item then explicitly deleting the widget on the layout item
+        # Also note that we need the SceneView widget to act as a parent of all the widgets in the layout, otherwise we'd have to iterate them all and delete them explicitly
+        if self.hbox.count() > 0:
+            oldScene = self.hbox.takeAt(0)
+            oldScene.widget().deleteLater()
+        self.hbox.addWidget(SceneView(scene))
 
-    def onNarration(self, narration):
-        self.widget.br(self.space[1])
-        self.addText(narration.text)
-        self.widget.br(self.space[1])
-        self.connect(gui.MOUSEBUTTONDOWN, self.onClickToProgress)
         
-    def onSay(self, say):
-        self.widget.br(self.space[1])
-        if(say.sourceActor.isPlayer):
-            self.addText('You say "' + say.text + '"')
-        else:
-            self.addText(say.sourceActor.name + ' says "' + say.text + '"')
-        self.widget.br(self.space[1])
-        self.connect(gui.MOUSEBUTTONDOWN, self.onClickToProgress)
-
-    def onClickToProgress(self):
-        if(self.scene.currentEvent):
-            self.disconnect(gui.MOUSEBUTTONDOWN, self.onClickToProgress)
-            self.scene.currentEvent.done = True
-            
-    def onGetUserText(self, getUserText):
-        self.widget.br(self.space[1])
-        self.addText(getUserText.caption)
-        self.widget.br(self.space[1])
-        i = gui.Input(size = 20)
-        self.textInput = i
-        self.widget.add(i)
-        i.focus()
-        i.connect(gui.ACTIVATE, self.onGetUserTextComplete, i)
-        self.widget.br(self.space[1])
-
-    def onGetUserTextComplete(self, i):
-        if (len(i.value) > 0) and self.scene.currentEvent:
-            self.scene.currentEvent.setText(i.value)
-            i.blur() # remove focus so that it doesn't hang around even though we remove from the container
-            self.textInput = None
-            self.widget.remove(i)
-            self.widget.removeLine()
-            self.widget.removeLine()
-            self.widget.removeLine()
-        
-    def event(self,e):
-        super().event(e)
-#         if(self.scene.currentEvent):
-#             eventType = type(self.scene.currentEvent)
-#             if e.type == pygame.MOUSEBUTTONDOWN:
-#                 if(eventType is events.Say or eventType is events.Narration):
-#                     self.scene.currentEvent.done = True
-                
-            

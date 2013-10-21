@@ -8,8 +8,11 @@ class Event():
     def __init__(self):
         self.name = 'Something happened'
 
-    def trigger(self):
-        pass
+    def trigger(self, scene):
+        self.scene = scene
+
+    def next(self):
+        self.scene.doNextEvent()
 
         
 class Say(Event):
@@ -19,59 +22,51 @@ class Say(Event):
         self.text = text
         self.func = func
         
-    def trigger(self):
+    def trigger(self, *args, **kw):
+        super().trigger(*args, **kw)
         if(self.func):
             self.text = self.func()
-        
-    def next(self):
-        return True
 
     
 class Narration(Event):
     def __init__(self, t):
         super().__init__()
         self.text = t
-                
-    def next(self):
-        return True
-
+        
 
 class GameOver(Event):
     def __init__(self):
         super().__init__()
 
     def next(self):
-        return False # never end
+        pass #never end
 
 
 class GetUserText(Event):
     def __init__(self, caption, func):
         super().__init__()
-        self.done = False 
         self.caption = caption
         self.func = func
-
-    def render(self, view):
-        view.onGetUserText(self)
     
     def next(self):
-        return self.done
+        pass # don't end except when the user enters text
     
     def setText(self, text):
         self.text = text
         if(self.func):
             self.func(text)
-        self.done = True
+        self.scene.doNextEvent()
 
 
-# class ChangeScene(Event):
-#     def __init__(self, scene):
-#         super().__init__()
-#         self.scene = scene
-#     
-#     def render(self, view):
-#         pass
-#     
-#     def update(self):
-#         return not self.done
-#     
+class GetUserChoice(Event):
+    def __init__(self, caption, choices):
+        super().__init()
+        
+    def next(self):
+        pass # don't end except when the user enters a choice
+    
+    def setChoice(self, choiceIndex):
+        if(self.choices[choiceIndex].func):
+            self.choices[choiceIndex].func()
+        self.scene.doNextEvent()
+
