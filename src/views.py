@@ -4,7 +4,6 @@ Created on 06/10/2013
 @author: Ben
 '''
 from PySide import QtGui, QtCore
-from gamestate import GameState
 
 
 class Paragraph(QtGui.QLabel):
@@ -13,30 +12,42 @@ class Paragraph(QtGui.QLabel):
         super().__init__()
         self.setText(text)  
         self.setWordWrap(True)
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Preferred);
+        self.setMargin(0)
+        self.setStyleSheet("border: 1px solid grey")
+        self.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Fixed)
 
+#    def sizeHint(self):
+#        return QtCore.QSize(self.parent().width(), self.heightForWidth(self.parent().width()))
 
 class SceneView(QtGui.QScrollArea):
 
     def __init__(self, scene):
         super().__init__()
+        
+        # hook up to the game logic
         self.scene = scene
         scene.sigEvent.connect(self.onSceneEvent)
 
-        # why doesn't this work?
-        #s = QtGui.QWidget()
-        #self.setWidget(s)
-        #s.setLayout(hbox)
+        # scrollbar always on to avoid jarring layout change, and make sure we're at the end when resizing the scroll area
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.verticalScrollBar().rangeChanged.connect(self.onScrollRangeChanged)
+        
+        # create a widget to live in the scroll area, so that we can set a layout on it. We want it to use all the space it can.
         hbox = QtGui.QHBoxLayout()
-        self.setLayout(hbox)
+        s = QtGui.QWidget()
+        s.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
+        s.setLayout(hbox)
+        self.setWidgetResizable(True)
+        self.setWidget(s)
+
+        # the centre of the scene view is a vertical stack of events, aligned to the top
         hbox.addStretch(1)
         self.vbox = QtGui.QVBoxLayout()
-        self.vbox.addStretch()
         hbox.addLayout(self.vbox, 3)
         hbox.addStretch(1)
-
+        self.vbox.setAlignment(QtCore.Qt.AlignTop)
         t = Paragraph(scene.name)
-        self.vbox.insertWidget(self.vbox.count() - 1, t)
+        self.vbox.insertWidget(self.vbox.count() , t)
         
     def onSceneEvent(self, event):
         self.currentEvent = event
@@ -46,24 +57,27 @@ class SceneView(QtGui.QScrollArea):
                 text = 'You say "' + text + '"'
             else:
                 text = event.sourceActor.name + ' says "' + text + '"'
-            self.vbox.insertWidget(self.vbox.count() - 1, Paragraph(text))
+            self.vbox.addWidget(Paragraph(text))
         elif event.__class__.__name__ == 'Narration':
             p = Paragraph(event.text)
-            self.vbox.insertWidget(self.vbox.count() - 1, p)
-            print(p.sizeHint())
+            self.vbox.addWidget(p)
         elif event.__class__.__name__ == 'GetUserText':
-            self.vbox.insertWidget(self.vbox.count() - 1, Paragraph(event.caption))
+            self.vbox.addWidget(Paragraph(event.caption))
             e = QtGui.QLineEdit()
             self.getUserText = e
             e.returnPressed.connect(self.onGetUserText)
-            self.vbox.insertWidget(self.vbox.count() - 1, e)
-
+            self.vbox.addWidget(e)
+    
+    def onScrollRangeChanged(self, maxX, maxY):
+        self.verticalScrollBar().setValue(maxY)
+        
     def onGetUserText(self):
         #remove caption and QLineEdit
-        oldText = self.vbox.takeAt(self.vbox.count() - 2)
+        oldText = self.vbox.takeAt(self.vbox.count() - 1)
         oldText.widget().deleteLater()
-        oldText = self.vbox.takeAt(self.vbox.count() - 2)
+        oldText = self.vbox.takeAt(self.vbox.count() - 1)
         oldText.widget().deleteLater()
+        #tell the gamestate about the text
         self.currentEvent.setText(self.getUserText.text())
 
 
@@ -73,8 +87,8 @@ class GameView(QtGui.QWidget):
         super().__init__()
         self.gameState = gameState        
         self.gameState.sigEnterScene.connect(self.onEnterScene)
-        self.hbox = QtGui.QVBoxLayout()
-        self.setLayout(self.hbox)
+        self.vbox = QtGui.QVBoxLayout()
+        self.setLayout(self.vbox)
 
     def mousePressEvent(self, e):
         self.gameState.next()
@@ -82,9 +96,9 @@ class GameView(QtGui.QWidget):
     def onEnterScene(self, scene):
         # Qt requires removing the layout item then explicitly deleting the widget on the layout item
         # Also note that we need the SceneView widget to act as a parent of all the widgets in the layout, otherwise we'd have to iterate them all and delete them explicitly
-        if self.hbox.count() > 0:
-            oldScene = self.hbox.takeAt(0)
+        if self.vbox.count() > 0:
+            oldScene = self.vbox.takeAt(0)
             oldScene.widget().deleteLater()
-        self.hbox.addWidget(SceneView(scene))
+        self.vbox.addWidget(SceneView(scene))
 
         

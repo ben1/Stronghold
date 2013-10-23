@@ -3,7 +3,7 @@
 import sys
 from PySide import QtGui, QtCore
 from gamestate import GameState
-from views import GameView, SceneView, Paragraph
+from views import GameView
 
 
 class MainMenu(QtGui.QWidget):
