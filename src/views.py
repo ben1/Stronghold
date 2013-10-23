@@ -23,6 +23,7 @@ class SceneView(QtGui.QScrollArea):
 
     def __init__(self, scene):
         super().__init__()
+        self.completingTextInput = False
         
         # hook up to the game logic
         self.scene = scene
@@ -49,6 +50,13 @@ class SceneView(QtGui.QScrollArea):
         t = Paragraph(scene.name)
         self.vbox.insertWidget(self.vbox.count() , t)
         
+    def keyPressEvent(self, e):
+        # filter out \r from getting back to parent in the case where we know return was just used to complete some text entry
+        if e.text() == '\r' and self.completingTextInput:
+                self.completingTextInput = False
+                return
+        super().keyPressEvent(e)
+        
     def onSceneEvent(self, event):
         self.currentEvent = event
         if event.__class__.__name__ == 'Say':
@@ -57,7 +65,8 @@ class SceneView(QtGui.QScrollArea):
                 text = 'You say "' + text + '"'
             else:
                 text = event.sourceActor.name + ' says "' + text + '"'
-            self.vbox.addWidget(Paragraph(text))
+            p = Paragraph(text)
+            self.vbox.addWidget(p)
         elif event.__class__.__name__ == 'Narration':
             p = Paragraph(event.text)
             self.vbox.addWidget(p)
@@ -67,11 +76,13 @@ class SceneView(QtGui.QScrollArea):
             self.getUserText = e
             e.returnPressed.connect(self.onGetUserText)
             self.vbox.addWidget(e)
+            e.setFocus()
     
     def onScrollRangeChanged(self, maxX, maxY):
         self.verticalScrollBar().setValue(maxY)
         
     def onGetUserText(self):
+        self.completingTextInput = True
         #remove caption and QLineEdit
         oldText = self.vbox.takeAt(self.vbox.count() - 1)
         oldText.widget().deleteLater()
@@ -79,6 +90,7 @@ class SceneView(QtGui.QScrollArea):
         oldText.widget().deleteLater()
         #tell the gamestate about the text
         self.currentEvent.setText(self.getUserText.text())
+        self.setFocus() # now that the QLineEdit is gone, get focus back to the scene view
 
 
 class GameView(QtGui.QWidget):
@@ -90,9 +102,22 @@ class GameView(QtGui.QWidget):
         self.vbox = QtGui.QVBoxLayout()
         self.setLayout(self.vbox)
 
+    def showEvent(self, e):
+        super().showEvent(e)
+        self.setFocus()
+        
     def mousePressEvent(self, e):
-        self.gameState.next()
-
+        if e.button() == QtCore.Qt.LeftButton:
+            self.gameState.next()
+        else:
+            super().mousePressEvent(e)
+    
+    def keyPressEvent(self, e):
+        if e.text() == '\r':
+            self.gameState.next()
+        else:
+            super().keyPressEvent(e)
+            
     def onEnterScene(self, scene):
         # Qt requires removing the layout item then explicitly deleting the widget on the layout item
         # Also note that we need the SceneView widget to act as a parent of all the widgets in the layout, otherwise we'd have to iterate them all and delete them explicitly
