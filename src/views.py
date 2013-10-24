@@ -73,25 +73,40 @@ class SceneView(QtGui.QScrollArea):
         elif event.__class__.__name__ == 'GetUserText':
             self.vbox.addWidget(Paragraph(event.caption))
             e = QtGui.QLineEdit()
-            self.getUserText = e
-            e.returnPressed.connect(self.onGetUserText)
+            e.returnPressed.connect(lambda : self.onGetUserText(e))
             self.vbox.addWidget(e)
             e.setFocus()
-    
+        elif event.__class__.__name__ == 'GetUserChoice':
+            self.vbox.addWidget(Paragraph(event.caption))
+            for choice in event.choices:
+                b = QtGui.QPushButton(choice.text)
+                b.clicked.connect(lambda : self.onGetUserChoice(choice))
+                self.vbox.addWidget(b)
+                b.setFocus()
+            
     def onScrollRangeChanged(self, maxX, maxY):
         self.verticalScrollBar().setValue(maxY)
         
-    def onGetUserText(self):
+    def onGetUserText(self, edit):
         self.completingTextInput = True
         #remove caption and QLineEdit
-        oldText = self.vbox.takeAt(self.vbox.count() - 1)
-        oldText.widget().deleteLater()
-        oldText = self.vbox.takeAt(self.vbox.count() - 1)
-        oldText.widget().deleteLater()
+        for _ in range(2):
+            old = self.vbox.takeAt(self.vbox.count() - 1)
+            old.widget().deleteLater()
         #tell the gamestate about the text
-        self.currentEvent.setText(self.getUserText.text())
-        self.setFocus() # now that the QLineEdit is gone, get focus back to the scene view
+        self.currentEvent.setText(edit.text())
+        # now that the QLineEdit is gone, get focus back to the scene view
+        self.setFocus()
 
+    def onGetUserChoice(self, choice):
+        # remove caption and all buttons
+        for _ in range(len(self.currentEvent.choices) + 1):
+            old = self.vbox.takeAt(self.vbox.count() - 1)
+            old.widget().deleteLater()
+        # tell the gamestate about the choice
+        self.currentEvent.setChoice(choice)
+        # now that the buttons are gone, get focus back to the scene view
+        self.setFocus()
 
 class GameView(QtGui.QWidget):
     

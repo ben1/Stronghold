@@ -29,6 +29,7 @@ class GameState(QtCore.QObject):
         ns.addEvent(events.Say(self.player, "", lambda : "I am " + self.player.name + ", Emperor."))
         ns.addEvent(events.Say(self.emperor, "Ah yes, I'm told you saved my life by killing an assassin at the parade last week."))
         ns.addEvent(events.Say(self.emperor, "And if I'm not mistaken, the same Imperial agent who ended the siege of Ilsar, and more recently found the Tantoma Scrolls. The Arcanum tells me they are learning much from them."))
+        ns.addEvent(events.GetUserChoice("Do you ...", [events.GetUserChoice.Choice('Stay Silent'), events.GetUserChoice.Choice('Speak up', lambda : print("spoke"))]))
         ns.addEvent(events.Say(self.emperor, "The Empire is repaying your loyalty and resourcefulness by elevating you to nobility. Perhaps others will be inspired by your success."))
         ns.addEvent(events.Say(self.emperor, "", lambda : "Arise Dominus " + self.player.name + "."))
         ns.addEvent(events.Say(self.emperor, "Now there is the matter of a domain to live on. The Caldar region requires a new Dominus urgently, as it has been several months since Dominus Tenjin disappeared."))

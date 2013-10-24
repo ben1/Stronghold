@@ -59,14 +59,21 @@ class GetUserText(Event):
 
 
 class GetUserChoice(Event):
+    class Choice:
+        def __init__(self, text, func = None):
+            self.text = text
+            self.func = func
+            
     def __init__(self, caption, choices):
-        super().__init()
+        super().__init__()
+        self.caption = caption
+        self.choices = choices
         
     def next(self):
         pass # don't end except when the user enters a choice
     
-    def setChoice(self, choiceIndex):
-        if(self.choices[choiceIndex].func):
-            self.choices[choiceIndex].func()
+    def setChoice(self, choice):
+        if(choice.func):
+            choice.func()
         self.scene.doNextEvent()
 
