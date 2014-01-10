@@ -28,7 +28,7 @@ class Scene(QtCore.QObject):
         self.doNextEvent()
 
     def leave(self):
-        pass
+        self.onExit(self.gameState)
         
     def next(self):
         if self.currentEvent:

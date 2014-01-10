@@ -4,6 +4,7 @@ import sys
 from PySide import QtGui, QtCore
 from gamestate import GameState
 from views import GameView
+import imperial
 
 
 class MainMenu(QtGui.QWidget):
@@ -61,6 +62,7 @@ class AppWindow(QtGui.QMainWindow):
             else:
                 return
         self.gameState = GameState()
+        imperial.addSceneTemplates(self.gameState)
         self.gameView = GameView(self.gameState)
         self.gameState.init()
         self.setCentralWidget(self.gameView)
