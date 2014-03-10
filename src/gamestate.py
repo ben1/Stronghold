@@ -1,14 +1,13 @@
 
 from PySide import QtCore
 import actors
-import scenes
-import events
+import scene
 
 ''' 
 '''
 class GameState(QtCore.QObject):
-    sigEnterScene = QtCore.Signal(scenes.Scene)
-    sigLeaveScene = QtCore.Signal(scenes.Scene)
+    sigEnterScene = QtCore.Signal(scene.Scene)
+    sigLeaveScene = QtCore.Signal(scene.Scene)
     
     def __init__(self):
         super().__init__()
@@ -30,10 +29,10 @@ class GameState(QtCore.QObject):
     def addSceneTemplate(self, sceneTemplate):
         self.sceneTemplates.append(sceneTemplate)
         
-    def enterScene(self, scene):
-        self.scene = scene
-        self.sigEnterScene.emit(scene)
-        scene.enter(self) #has to be after sigEnterScene otherwise events aren't hooked up before scene.enter() triggers them.
+    def enterScene(self, sc):
+        self.scene = sc
+        self.sigEnterScene.emit(sc)
+        sc.enter(self) #has to be after sigEnterScene otherwise events aren't hooked up before scene.enter() triggers them.
 
     def leaveScene(self):
         if self.scene:
@@ -62,8 +61,8 @@ class GameState(QtCore.QObject):
                     validSceneTemplates.append((st.score(self), st))
             if len(validSceneTemplates) > 0:
                 validSceneTemplates.sort(key = lambda t : t[0])
-                self.enterScene(validSceneTemplates[0][1])
+                self.enterScene(validSceneTemplates[0][1].generateScene(self))
                 return
-            self.enterScene(scenes.GameOver())
+            self.enterScene(scene.GameOver())
 
 
