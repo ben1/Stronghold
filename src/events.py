@@ -74,6 +74,6 @@ class GetUserChoice(Event):
     
     def setChoice(self, choice):
         if(choice.func):
-            choice.func()
+            choice.func(self.scene)
         self.scene.doNextEvent()
 
