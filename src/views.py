@@ -80,7 +80,9 @@ class SceneView(QtGui.QScrollArea):
             self.vbox.addWidget(Paragraph(event.caption))
             for choice in event.choices:
                 b = QtGui.QPushButton(choice.text)
-                b.clicked.connect(lambda : self.onGetUserChoice(choice))
+                def onClick(choice = choice): # we must copy the variable so that the closure for the method refers to different variables for each button
+                    self.onGetUserChoice(choice)
+                b.clicked.connect(onClick)
                 self.vbox.addWidget(b)
                 b.setFocus()
             
