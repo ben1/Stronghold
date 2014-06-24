@@ -88,7 +88,7 @@ def railvanStation(gameState):
         ns.name = st.name
         ns.addEvent(events.Narration("And so early in the morning, you push your way through the bustle of the capital to the central rail station, looking for your advisor. He is not hard to spot, surrounded by twenty Imperial guards."))
         ns.addEvent(events.Say(gameState.advisor, "", lambda : "Good morning " + gameState.player.name + "! I can see you haven't brought much apart from your weapons, but never fear, I have many books on a variety of subjects. We can also buy some clothes on the way."))
-        ns.addEvent(events.Narration("Johan steps up into the first class railvan carriage being pushed in front of the engine, and you follow him. The troops pack into a van pulled behind, and the caravan jolts forward slowly gaining speed."))
+        ns.addEvent(events.Narration(gameState.advisor.firstName + " steps up into the first class railvan carriage being pushed in front of the engine, and you follow him. The troops pack into a van pulled behind, and the caravan jolts forward slowly gaining speed."))
         def onExit(gameState):
             gameState.location = 'Railvan to Hyree'
         ns.onExit = onExit

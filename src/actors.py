@@ -22,9 +22,12 @@ class Emperor(Actor):
     def __init__(self):
         super().__init__()
         self.name = 'Emperor Kanate'
+        self.firstName = 'Emperor'
         
 class Advisor(Actor):
     def __init__(self):
         super().__init__()
         self.name = 'Johan Kratz'
+        self.firstName = 'Johan'
+        
 
