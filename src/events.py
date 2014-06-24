@@ -55,7 +55,7 @@ class GetUserText(Event):
         self.text = text
         if(self.func):
             self.func(text)
-        self.scene.doNextEvent()
+        super().next()
 
 
 class GetUserChoice(Event):
@@ -75,5 +75,5 @@ class GetUserChoice(Event):
     def setChoice(self, choice):
         if(choice.func):
             choice.func(self.scene)
-        self.scene.doNextEvent()
+        super().next()
 
