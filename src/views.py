@@ -118,10 +118,6 @@ class GameView(QtGui.QWidget):
         self.gameState.sigEnterScene.connect(self.onEnterScene)
         self.vbox = QtGui.QVBoxLayout()
         self.setLayout(self.vbox)
-
-    def showEvent(self, e):
-        super().showEvent(e)
-        self.setFocus()
         
     def mousePressEvent(self, e):
         if e.button() == QtCore.Qt.LeftButton:
