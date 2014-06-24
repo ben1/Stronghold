@@ -10,8 +10,9 @@ import events
 class Scene(QtCore.QObject):
     sigEvent = QtCore.Signal(events.Event)
     
-    def __init__(self):
+    def __init__(self, gameState):
         super().__init__()
+        self.gameState = gameState
         self.name = 'Somewhere'
         self.actors = {}
         self.events = []
@@ -24,11 +25,10 @@ class Scene(QtCore.QObject):
         self.events.append(event)
         
     def enter(self, gameState):
-        self.gameState = gameState
         self.doNextEvent()
 
     def leave(self):
-        self.onExit(self.gameState)
+        self.onExit()
         
     def next(self):
         if self.currentEvent:
@@ -48,8 +48,8 @@ class Scene(QtCore.QObject):
 
         
 class GameOver(Scene):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, gameState):
+        super().__init__(gameState)
         self.name = 'Game Over'
         self.addEvent(events.Narration('Sorry but you must try again.'))
         self.addEvent(events.GameOver())

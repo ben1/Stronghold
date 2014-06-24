@@ -10,10 +10,23 @@ import events
 class SceneTemplate(QtCore.QObject):
     sigEvent = QtCore.Signal(events.Event)
     
-    def __init__(self):
+    def __init__(self, gameState):
         super().__init__()
+        self.gameState = gameState
 
-        
-    
+
+class SceneTemplateRegistry():
+    def __init__(self):
+        self.sceneTemplates = []
+
+    def __call__(self, sceneTemplateClass):
+        self.sceneTemplates.append(sceneTemplateClass)
+
+    def register(self, gameState):
+        for s in self.sceneTemplates:
+            gameState.addSceneTemplate(s(gameState))
+
+
+sceneTemplate = SceneTemplateRegistry()
 
 

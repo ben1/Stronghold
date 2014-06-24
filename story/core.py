@@ -9,13 +9,13 @@ def addSceneTemplates(gameState):
 
 
 @sceneTemplate
-class ImperialCourt(scenetemplate.SceneTemplate):
+class CouncilMeeting(scenetemplate.SceneTemplate):
     def __init__(self, gameState):
         super().__init__(gameState)
-        self.name = 'Imperial Court'
+        self.name = 'Council Meeting'
     
     def isValid(self):
-        return self.gameState.location == 'Imperial Court'
+        return self.gameState.location == 'Stronghold'
     
     def score(self):
         return 0

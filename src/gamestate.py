@@ -19,7 +19,6 @@ class GameState(QtCore.QObject):
         self.advisor = actors.Advisor()
                 
     def init(self):
-        self.location = 'Imperial Court'
         self.prepareNextScene()
         
 
@@ -57,12 +56,12 @@ class GameState(QtCore.QObject):
         else:
             validSceneTemplates = []
             for st in self.sceneTemplates:
-                if st.isValid(self):
-                    validSceneTemplates.append((st.score(self), st))
+                if st.isValid():
+                    validSceneTemplates.append((st.score(), st))
             if len(validSceneTemplates) > 0:
                 validSceneTemplates.sort(key = lambda t : t[0])
-                self.enterScene(validSceneTemplates[0][1].generateScene(self))
+                self.enterScene(validSceneTemplates[0][1].Scene(self, validSceneTemplates[0][1]))
                 return
-            self.enterScene(scene.GameOver())
+            self.enterScene(scene.GameOver(self))
 
 
