@@ -24,5 +24,5 @@ Algorithm
 For all templates, find all potential instances that match existing variables, then score all potential instances
 
 Scoring
-The best score is 0. Potential instances lose points for all rules that don't macth perfectly, and lose points for not being relevant / timely / helping the arc, etc.
+A higher score is better. Potential instances lose points for all rules that don't macth perfectly, and lose points for not being relevant / timely / helping the arc, etc.
 '''

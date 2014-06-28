@@ -13,6 +13,7 @@ class GameState(QtCore.QObject):
         super().__init__()
         self.sceneTemplates = []
         self.pendingScenes = []
+        self.state = {}
 
         self.player = actors.Player()
         self.emperor = actors.Emperor()
@@ -20,7 +21,12 @@ class GameState(QtCore.QObject):
                 
     def init(self):
         self.prepareNextScene()
-        
+
+    def getState(self, key):
+        return self.state.get(key, None)
+
+    def setState(self, key, value):
+        self.state[key] = value
 
     def cleanup(self):
         self.leaveScene()
@@ -59,7 +65,7 @@ class GameState(QtCore.QObject):
                 if st.isValid():
                     validSceneTemplates.append((st.score(), st))
             if len(validSceneTemplates) > 0:
-                validSceneTemplates.sort(key = lambda t : t[0])
+                validSceneTemplates.sort(key = lambda t : -t[0]) # put highest values first
                 self.enterScene(validSceneTemplates[0][1].Scene(self, validSceneTemplates[0][1]))
                 return
             self.enterScene(scene.GameOver(self))

@@ -9,13 +9,48 @@ def addSceneTemplates(gameState):
 
 
 @sceneTemplate
+class Welcoming(scenetemplate.SceneTemplate):
+    def __init__(self, gameState):
+        super().__init__(gameState)
+        self.name = 'Welcoming'
+
+    def isValid(self):
+        return self.gameState.getState('location') == 'Stronghold' and self.gameState.getState('welcomed') != True
+
+    def score(self):
+        return 1000
+
+    class Scene(scene.Scene):
+        def __init__(self, gameState, sceneT):
+            super().__init__(gameState)
+            self.name = sceneT.name
+            self.addEvent(events.Narration("It is a grey and windy afternoon when your party sights the stronghold silhouetted on a ridge. This outpost, seated before the great snowy mountains of the North, and overlooking the rolling hills and forests of the wild-lands is to be your home. Remembering the attack on your party, you suddenly realise how vulnerable you are outside its walls.")) 
+            self.addEvent(events.Narration("The path up from the valley floor winds back and forth, and the horses plod the last stretch up to the gates. The guard slouched by the open gate walks up to greet you."))
+            self.addEvent(events.Narration('"Welcome to Hyree commander, we could do with some help."'))
+            self.addEvent(events.GetUserChoice("Do you respond with...", [('Charisma', self.cCharisma), ('Seriousness', self.cSerious), ('Self-deprecation', self.cDeprecation)]))
+        def onExit(self):
+            self.gameState.setState('welcomed', True)
+
+        def cCharisma(self):
+            self.addEvent(events.Narration('You respond with a winning smile and say "I am sure we will be able to sort it all out!". The guard gives you an uneasy smile.'))
+            self.cContinue()
+        def cSerious(self):
+            self.addEvent(events.Narration('You respond with a stern look and say "Things will certainly change now that I am here. Next time you are at the gates you will wear your helmet at all times. Understood?" The guard frowns alightly but just nods mutely.'))        
+            self.cContinue()
+        def cDeprecation(self):
+            self.addEvent(events.Narration('You respond with a weak smile and say "Well, I might be able to help... we shall see." The guard loses his smile, but laughs politely.'))
+            self.cContinue()
+        def cContinue(self):
+            self.addEvent(events.Narration("Your party is led through the gates and you dismount in the courtyard. Several other guards are on the walls, but there are far fewer people about than you expected. Another man greets you and leads you into the keep to meet the captain of the guard."))
+
+@sceneTemplate
 class CouncilMeeting(scenetemplate.SceneTemplate):
     def __init__(self, gameState):
         super().__init__(gameState)
         self.name = 'Council Meeting'
     
     def isValid(self):
-        return self.gameState.location == 'Stronghold'
+        return self.gameState.getState('location') == 'Stronghold'
     
     def score(self):
         return 0
@@ -30,9 +65,7 @@ class CouncilMeeting(scenetemplate.SceneTemplate):
             self.addEvent(events.Say(self.gameState.player, "", lambda : "I am " + self.gameState.player.name + ", Emperor."))
             self.addEvent(events.Say(self.gameState.emperor, "Ah yes, I'm told you saved my life by killing an assassin at the parade last week."))
             self.addEvent(events.Say(self.gameState.emperor, "And if I'm not mistaken, the same Imperial agent who ended the siege of Ilsar, and more recently found the Tantoma Scrolls. The Arcanum tells me they are learning much from them."))
-            choiceContinue = events.GetUserChoice.Choice('Modest', self.choiceContinue)
-            choiceProud = events.GetUserChoice.Choice('Proud', self.choiceProud)
-            self.addEvent(events.GetUserChoice("Are you ...", [choiceContinue, choiceProud]))
+            self.addEvent(events.GetUserChoice("Are you ...", [('Modest', self.choiceContinue), ('Proud', self.choiceProud)]))
         
         def choiceProud(self):
             self.addEvent(events.Say(self.gameState.player, "Those are the least of my accomplishments my Emperor!"))
@@ -49,29 +82,6 @@ class CouncilMeeting(scenetemplate.SceneTemplate):
             self.addEvent(events.Narration("Nobility! All of your descendants will bear this status. If you have any, that is. The thought of governing a domain makes you a little nervous, but how hard can the life of a noble be? You've definitely survived worse."))
 
         def onExit(self):
-            self.gameState.location = 'Arinna Central Railvan Station'
+            self.gameState.setState('location', 'Arinna Central Railvan Station')
             
 
-@sceneTemplate
-class RailvanStation(scenetemplate.SceneTemplate):
-    def __init__(self, gameState):
-        super().__init__(gameState)
-        self.name = 'Arinna Central Railvan Station'
-     
-    def isValid(self):
-        return self.gameState.location == self.name
-     
-    def score(self):
-        return 0
-     
-    class Scene(scene.Scene):
-        def __init__(self, gameState, sceneT):
-            super().__init__(gameState)
-            self.name = sceneT.name
-            self.addEvent(events.Narration("And so early in the morning, you push your way through the bustle of the capital to the central rail station, looking for your advisor. He is not hard to spot, surrounded by twenty Imperial guards."))
-            self.addEvent(events.Say(gameState.advisor, "", lambda : "Good morning " + gameState.player.name + "! I can see you haven't brought much apart from your weapons, but never fear, I have many books on a variety of subjects. We can also buy some clothes on the way."))
-            self.addEvent(events.Narration(gameState.advisor.firstName + " steps up into the first class railvan carriage being pushed in front of the engine, and you follow him. The troops pack into a van pulled behind, and the caravan jolts forward slowly gaining speed."))
-
-        def onExit(self):
-            self.gameState.location = 'Railvan to Hyree'
-     

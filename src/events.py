@@ -63,11 +63,13 @@ class GetUserChoice(Event):
         def __init__(self, text, func = None):
             self.text = text
             self.func = func
-            
+
     def __init__(self, caption, choices):
         super().__init__()
         self.caption = caption
-        self.choices = choices
+        self.choices = []
+        for c in choices:
+            self.choices.append(GetUserChoice.Choice(c[0], c[1]))
         
     def next(self):
         pass # don't end except when the user enters a choice

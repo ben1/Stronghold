@@ -15,7 +15,7 @@ class ImperialCourt(scenetemplate.SceneTemplate):
         self.name = 'Imperial Court'
     
     def isValid(self):
-        return self.gameState.location == 'Imperial Court'
+        return self.gameState.state['location'] == 'Imperial Court'
     
     def score(self):
         return 0
@@ -49,7 +49,7 @@ class ImperialCourt(scenetemplate.SceneTemplate):
             self.addEvent(events.Narration("Nobility! All of your descendants will bear this status. If you have any, that is. The thought of governing a domain makes you a little nervous, but how hard can the life of a noble be? You've definitely survived worse."))
 
         def onExit(self):
-            self.gameState.location = 'Arinna Central Railvan Station'
+            self.gameState.setState('location', 'Arinna Central Railvan Station')
             
 
 @sceneTemplate
@@ -59,7 +59,7 @@ class RailvanStation(scenetemplate.SceneTemplate):
         self.name = 'Arinna Central Railvan Station'
      
     def isValid(self):
-        return self.gameState.location == self.name
+        return self.gameState.getState('location') == self.name
      
     def score(self):
         return 0
@@ -73,5 +73,5 @@ class RailvanStation(scenetemplate.SceneTemplate):
             self.addEvent(events.Narration(gameState.advisor.firstName + " steps up into the first class railvan carriage being pushed in front of the engine, and you follow him. The troops pack into a van pulled behind, and the caravan jolts forward slowly gaining speed."))
 
         def onExit(self):
-            self.gameState.location = 'Railvan to Hyree'
+            self.ggameState.setState('location', 'Railvan to Hyree')
      

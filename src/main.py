@@ -68,7 +68,7 @@ class AppWindow(QtGui.QMainWindow):
         core.addSceneTemplates(self.gameState)
         self.logGameView = LogGameView(self.gameState)
         self.gameView = GameView(self.gameState)
-        self.gameState.location = 'Stronghold'
+        self.gameState.setState('location', 'Stronghold')
         self.gameState.init()
         self.setCentralWidget(self.gameView)
         
