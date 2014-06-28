@@ -1,7 +1,9 @@
 
 from PySide import QtCore
 import actors
+import events
 import scene
+import scenetemplate
 
 ''' 
 '''
@@ -14,6 +16,7 @@ class GameState(QtCore.QObject):
         self.sceneTemplates = []
         self.pendingScenes = []
         self.state = {}
+        self.actors = {}
 
         self.player = actors.Player()
         self.emperor = actors.Emperor()
@@ -25,7 +28,7 @@ class GameState(QtCore.QObject):
     def getState(self, key):
         return self.state.get(key, None)
 
-    def setState(self, key, value):
+    def setState(self, key, value = True):
         self.state[key] = value
 
     def cleanup(self):
@@ -66,8 +69,19 @@ class GameState(QtCore.QObject):
                     validSceneTemplates.append((st.score(), st))
             if len(validSceneTemplates) > 0:
                 validSceneTemplates.sort(key = lambda t : -t[0]) # put highest values first
-                self.enterScene(validSceneTemplates[0][1].Scene(self, validSceneTemplates[0][1]))
+                self.enterScene(validSceneTemplates[0][1].createScene())
                 return
-            self.enterScene(scene.GameOver(self))
+            self.enterScene(SceneTemplateGameOver(self).createScene())
 
+
+class SceneTemplateGameOver(scenetemplate.SceneTemplate):
+    def __init__(self, gameState):
+        super().__init__(gameState)
+        self.name = 'Game Over'
+        
+    class Scene(scene.Scene):
+        def __init__(self, template):
+            super().__init__(template)        
+            self.addEvent(events.Narration('Sorry but you must try again.'))
+            self.addEvent(events.GameOver())
 

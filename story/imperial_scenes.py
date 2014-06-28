@@ -20,10 +20,12 @@ class ImperialCourt(scenetemplate.SceneTemplate):
     def score(self):
         return 0
 
+    def leave(self):
+        self.gameState.setState('location', 'Arinna Central Railvan Station')
+
     class Scene(scene.Scene):
-        def __init__(self, gameState, sceneT):
-            super().__init__(gameState)
-            self.name = sceneT.name
+        def __init__(self, template):
+            super().__init__(template)
             self.addEvent(events.Narration("The Emperor regards you down his long nose as you kneel before him. As the pause extends, you begin to feel uncomfortable."))
             self.addEvent(events.Say(self.gameState.emperor, "What was your name again?"))
             self.addEvent(events.GetUserText("Type your name and press Enter", lambda text : setattr(self.gameState.player, 'name', text)))
@@ -48,8 +50,6 @@ class ImperialCourt(scenetemplate.SceneTemplate):
             self.addEvent(events.Say(self.gameState.emperor, "You will leave on tomorrow's Eastern railvan."))
             self.addEvent(events.Narration("Nobility! All of your descendants will bear this status. If you have any, that is. The thought of governing a domain makes you a little nervous, but how hard can the life of a noble be? You've definitely survived worse."))
 
-        def onExit(self):
-            self.gameState.setState('location', 'Arinna Central Railvan Station')
             
 
 @sceneTemplate
@@ -64,14 +64,14 @@ class RailvanStation(scenetemplate.SceneTemplate):
     def score(self):
         return 0
      
-    class Scene(scene.Scene):
-        def __init__(self, gameState, sceneT):
-            super().__init__(gameState)
-            self.name = sceneT.name
-            self.addEvent(events.Narration("And so early in the morning, you push your way through the bustle of the capital to the central rail station, looking for your advisor. He is not hard to spot, surrounded by twenty Imperial guards."))
-            self.addEvent(events.Say(gameState.advisor, "", lambda : "Good morning " + gameState.player.name + "! I can see you haven't brought much apart from your weapons, but never fear, I have many books on a variety of subjects. We can also buy some clothes on the way."))
-            self.addEvent(events.Narration(gameState.advisor.firstName + " steps up into the first class railvan carriage being pushed in front of the engine, and you follow him. The troops pack into a van pulled behind, and the caravan jolts forward slowly gaining speed."))
+    def leave(self):
+        self.gameState.setState('location', 'Railvan to Hyree')
 
-        def onExit(self):
-            self.ggameState.setState('location', 'Railvan to Hyree')
+    class Scene(scene.Scene):
+        def __init__(self, template):
+            super().__init__(template)
+            self.addEvent(events.Narration("And so early in the morning, you push your way through the bustle of the capital to the central rail station, looking for your advisor. He is not hard to spot, surrounded by twenty Imperial guards."))
+            self.addEvent(events.Say(self.gameState.advisor, "", lambda : "Good morning " + self.gameState.player.name + "! I can see you haven't brought much apart from your weapons, but never fear, I have many books on a variety of subjects. We can also buy some clothes on the way."))
+            self.addEvent(events.Narration(self.gameState.advisor.firstName + " steps up into the first class railvan carriage being pushed in front of the engine, and you follow him. The troops pack into a van pulled behind, and the caravan jolts forward slowly gaining speed."))
+
      

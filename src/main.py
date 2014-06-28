@@ -5,8 +5,8 @@ from PySide import QtGui, QtCore
 from gamestate import GameState
 from views import GameView
 from logviews import LogGameView
-import imperial
-import core
+import imperial_scenes
+import core_scenes
 
 
 class MainMenu(QtGui.QWidget):
@@ -65,7 +65,7 @@ class AppWindow(QtGui.QMainWindow):
                 return
         self.gameState = GameState()
         #imperial.addSceneTemplates(self.gameState)
-        core.addSceneTemplates(self.gameState)
+        core_scenes.addSceneTemplates(self.gameState)
         self.logGameView = LogGameView(self.gameState)
         self.gameView = GameView(self.gameState)
         self.gameState.setState('location', 'Stronghold')

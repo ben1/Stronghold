@@ -6,28 +6,40 @@ Created on 05/10/2013
 
 class Actor():
     nextId = 1
-    def __init__(self):
+    def __init__(self, name, firstName):
         self.id = Actor.nextId
         Actor.nextId += 1
-        self.name = 'Someone'
+        self.name = name
+        self.firstName = firstName
         self.isPlayer = False
+        self.feelingsFor = {}
+        self.respectFor = {}
+        self.introduced = False
+        self.description = 'A non-descript person.'
 
+    def modFeelingsFor(self, actor, value):
+        self.feelingsFor[actor] = self.feelingsFor.get(actor, 0) + value
+    
+    def getFeelingsFor(self, actor):
+        return self.feelingsFor.get(actor, 0)
+
+    def modRespectFor(self, actor, value):
+        self.respectFor[actor] = self.respectFor.get(actor, 0) + value
+    
+    def getRespectFor(self, actor):
+        return self.respectFor.get(actor, 0)
 
 class Player(Actor):
     def __init__(self):
-        self.name = 'Some player'
+        super().__init__('Some player', 'Player')
         self.isPlayer = True
-        
+
 class Emperor(Actor):
     def __init__(self):
-        super().__init__()
-        self.name = 'Emperor Kanate'
-        self.firstName = 'Emperor'
-        
+        super().__init__('Emperor Kanate', 'Emperor')
+
 class Advisor(Actor):
     def __init__(self):
-        super().__init__()
-        self.name = 'Johan Kratz'
-        self.firstName = 'Johan'
-        
+        super().__init__('Johan Kratz', 'Johan')
+
 
