@@ -54,7 +54,7 @@ class Welcoming(scenetemplate.SceneTemplate):
             self.addEvent(events.Narration('You respond with a weak smile and say "Well, I might be able to help... we shall see." The guard laughs politely, but loses his smile.'))
             self.cContinue()
         def cContinue(self):
-            self.addEvent(events.Narration("Your party is led through the gates and you dismount in the courtyard. Several other guards are on the walls, but there are far fewer people about than you expected. Another man greets you and leads you into the keep to meet the captain of the guard."))
+            self.addEvent(events.Narration("Your party is led through the gates and you dismount in the courtyard. Several other guards are on the walls, but there are far fewer people about than you expected. Another man greets you and leads you into the barracks to meet the captain of the guard."))
 
 @sceneTemplate
 class MeetingCaptain(scenetemplate.SceneTemplate):
@@ -80,7 +80,7 @@ class MeetingCaptain(scenetemplate.SceneTemplate):
             self.actors = {}
             self.actors['captain'] = captain
             self.gameState.actors['captain'] = captain
-            self.addEvent(events.Narration("It is a grey and windy afternoon when your party sights the stronghold silhouetted on a ridge. This outpost, seated before the great snowy mountains of the North, and overlooking the rolling hills and forests of the wild-lands is to be your home. Remembering the attack on your party, you suddenly realise how vulnerable you are outside its walls.")) 
+            self.addEvent(events.Narration("Inside, sitting in a chair by the fire singing a loud bawdy song is captain Larode. He appears to have been drinking, and also appears to be missing the lower part of his left leg.")) 
 
 @sceneTemplate
 class CouncilMeeting(scenetemplate.SceneTemplate):

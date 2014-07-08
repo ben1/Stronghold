@@ -34,6 +34,17 @@ class Narration(Event):
         self.text = t
         
 
+class Func(Event):
+    def __init__(self, func):
+        super().__init__()
+        self.func = func
+    
+    def trigger(self, scene):
+        super().trigger(scene)
+        self.func()
+        self.next()
+        
+        
 class GameOver(Event):
     def __init__(self):
         super().__init__()

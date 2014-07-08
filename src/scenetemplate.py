@@ -13,6 +13,13 @@ class SceneTemplate(QtCore.QObject):
     def __init__(self, gameState):
         super().__init__()
         self.gameState = gameState
+        self.name = 'A Scene Template'
+    
+    def createScene(self):
+        return self.Scene(self)
+    
+    def leave(self):
+        pass
 
 
 class SceneTemplateRegistry():
