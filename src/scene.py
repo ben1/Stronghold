@@ -1,7 +1,8 @@
 '''
-Created on 05/10/2013
-
-@author: Ben
+A scene is an organizational unit for action in the game. It ties together a 
+few Actors and a series of events. The exact actors that may be involved in a
+scene depends on how the scene was initialized, and how the events play out
+depend on the starting conditions as well as how the actors act.
 '''
 from PySide import QtCore
 import events

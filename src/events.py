@@ -1,7 +1,6 @@
 '''
-Created on 05/10/2013
-
-@author: Ben
+This module contains the events that can occur in the game. These generally involve
+mutating the game state, displaying some text, or getting user input.
 '''
 
 class Event():

@@ -1,3 +1,6 @@
+'''
+This module contains a set of example scenes. It's still experimental.
+'''
 import actors
 import events
 import scene
@@ -82,7 +85,8 @@ class MeetingCaptain(scenetemplate.SceneTemplate):
             self.gameState.actors['captain'] = captain
             self.addEvent(events.Narration("Inside, sitting in a chair by the fire singing a loud bawdy song is captain Larode. He appears to have been drinking, and also appears to be missing the lower part of his left leg.")) 
 
-@sceneTemplate
+# exclude for now
+#@sceneTemplate
 class CouncilMeeting(scenetemplate.SceneTemplate):
     def __init__(self, gameState):
         super().__init__(gameState)

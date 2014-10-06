@@ -1,3 +1,8 @@
+'''
+The root object containing information about the state of the game world.
+It acts as a dictionary of miscellaneous information as well as a state-
+machine for the current scene.
+'''
 
 from PySide import QtCore
 import actors
@@ -5,8 +10,7 @@ import events
 import scene
 import scenetemplate
 
-''' 
-'''
+
 class GameState(QtCore.QObject):
     sigEnterScene = QtCore.Signal(scene.Scene)
     sigLeaveScene = QtCore.Signal(scene.Scene)

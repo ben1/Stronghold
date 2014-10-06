@@ -1,3 +1,6 @@
+'''
+This module contains scenes relevant to the imperial city section of the game.
+'''
 import events
 import scene
 import scenetemplate

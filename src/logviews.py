@@ -1,7 +1,5 @@
 '''
-Created on 06/10/2013
-
-@author: Ben
+A view of the game state that simply logs events to a file.
 '''
 
 

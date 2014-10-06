@@ -1,7 +1,6 @@
 '''
-Created on 06/10/2013
-
-@author: Ben
+These are the classes used to display the events in the game and get user 
+input. They are all specific to Qt.
 '''
 from PySide import QtGui, QtCore
 

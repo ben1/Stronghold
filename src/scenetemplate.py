@@ -1,7 +1,9 @@
 '''
-Created on 05/10/2013
-
-@author: Ben
+A SceneTemplate can create a scenes. A particular template may only create 
+one scene, or the template may be re-used under different circumstances to 
+create several similar scenes during the course of a game.
+Annotate your scene template classes with @sceneTemplate in order to add
+them to the SceneTemplateRegistry automatically. 
 '''
 from PySide import QtCore
 import events

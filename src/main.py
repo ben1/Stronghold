@@ -1,11 +1,12 @@
 """
+The main routine for the application that creates the window, initial game state 
+and kicks off the game.
 """
 import sys
 from PySide import QtGui, QtCore
 from gamestate import GameState
 from views import GameView
 from logviews import LogGameView
-import imperial_scenes
 import core_scenes
 
 

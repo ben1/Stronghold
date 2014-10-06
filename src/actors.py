@@ -1,7 +1,7 @@
 '''
-Created on 05/10/2013
-
-@author: Ben
+Actor is the base class for central characters in the game. It contains some basic information 
+as well as relationships to other characters (from their perspective).
+This module also contains a number of core characters.
 '''
 
 class Actor():
